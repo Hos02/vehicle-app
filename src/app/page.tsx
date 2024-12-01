@@ -1,9 +1,8 @@
-import SignInGithub from '@/components/signInGithub';
-import SignInGoogle from '@/components/signInGoogle';
-import { Button } from '@/components/ui/button'
+import VinDecoder from "@/components/VINDecoder";
+
 
 export default function Home() {
   return (
-    <main></main>
+   <VinDecoder/>
   );
 }

@@ -1,7 +1,7 @@
 'use client'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import Pagination from '@/components/ui/pagination'
 import { useState } from 'react'
 
 type Vehicle = {
@@ -12,12 +12,11 @@ type Vehicle = {
     EngineModel: string;
 }
 
-const VinDecoderPage = () => {
+const VinDecoder = function VinDecoder() {
     const [vin, setVin] = useState<string>('')
     const [vehicleData, setVehicleData] = useState<Vehicle[] | []>([])
     const [error, setError] = useState<string>('')
-    const [currentPage, setCurrentPage] = useState<number>(1)
-    const itemsPerPage = 5 
+  
 
     const handleSearch = async () => {
         if (vin.length !== 17) {
@@ -28,7 +27,6 @@ const VinDecoderPage = () => {
         try {
             const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json`)
             const data = await response.json()
-            console.log(data)
 
             if (data.Results && data.Results.length > 0) {
                 setVehicleData(data.Results)
@@ -36,17 +34,13 @@ const VinDecoderPage = () => {
                 setError('No vehicle data found for the provided VIN.')
                 setVehicleData([])
             }
-        } catch (err) {
+        } catch (error: unknown) {
+            console.error(error);
             setError('Failed to fetch vehicle data. Please try again later.')
             setVehicleData([])
         }
     }
-
-    const indexOfLastItem = currentPage * itemsPerPage
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage
-    const currentItems = vehicleData.slice(indexOfFirstItem, indexOfLastItem)
-    const totalPages = Math.ceil(vehicleData.length / itemsPerPage)
-
+    
     return (
         <div className='p-4 flex flex-col gap-5'>
             <Input
@@ -58,7 +52,7 @@ const VinDecoderPage = () => {
 
             {error && <p className="text-red-500">{error}</p>}
 
-            {currentItems.length > 0 && currentItems.map((vehicle: Vehicle, index) => (
+            {vehicleData ?  vehicleData.map((vehicle: Vehicle, index) => (
                 <div key={index} className="mt-4 p-4 border border-gray-300 rounded-md">
                     <h3 className="text-xl font-bold">Vehicle Information</h3>
                     <ul>
@@ -69,17 +63,9 @@ const VinDecoderPage = () => {
                         <li><strong>Engine Model:</strong> {vehicle.EngineModel}</li>
                     </ul>
                 </div>
-            ))}
-
-            {vehicleData.length > itemsPerPage && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
-            )}
+            )):null}
         </div>
     )
 }
 
-export default VinDecoderPage
+export default VinDecoder
